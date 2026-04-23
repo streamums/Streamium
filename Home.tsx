@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import {
   getTrending,
   getPopularMovies,
@@ -7,12 +8,12 @@ import {
   getTopRatedTV,
   getAiringTodayTV,
   getNowPlayingMovies,
+  img,
 } from "@/lib/tmdb";
 import { HeroSection } from "@/components/HeroSection";
 import { MediaRow } from "@/components/MediaRow";
 import { useContinueWatching } from "@/hooks/useContinueWatching";
-import { useLocation } from "wouter";
-import { img } from "@/lib/tmdb";
+import { MOVIE_GENRES, TV_GENRES } from "@/lib/constants";
 import { Play, X } from "lucide-react";
 
 export function Home() {
@@ -61,11 +62,47 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-[#09090b]">
-      {/* Hero */}
       {heroItems.length > 0 && <HeroSection items={heroItems} />}
 
-      {/* Content */}
       <div className="max-w-screen-xl mx-auto py-6 mt-2">
+        {/* Genre pills */}
+        <section className="mb-8 px-4 md:px-0">
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-2">
+                Movie Genres
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {MOVIE_GENRES.map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => navigate(`/genre/movie/${g.id}`)}
+                    className="text-sm text-zinc-300 border border-zinc-700 rounded-full px-3 py-1 hover:text-white hover:border-zinc-500 hover:bg-zinc-800 transition-colors"
+                  >
+                    {g.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-2">
+                TV Genres
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {TV_GENRES.map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => navigate(`/genre/tv/${g.id}`)}
+                    className="text-sm text-zinc-300 border border-zinc-700 rounded-full px-3 py-1 hover:text-white hover:border-zinc-500 hover:bg-zinc-800 transition-colors"
+                  >
+                    {g.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Continue Watching */}
         {continueList.length > 0 && (
           <section className="mb-8 px-4 md:px-0">
@@ -80,25 +117,36 @@ export function Home() {
                     onClick={() =>
                       navigate(
                         `/${entry.mediaType}/${entry.id}/watch${
-                          entry.season ? `?season=${entry.season}&episode=${entry.episode}` : ""
+                          entry.season
+                            ? `?season=${entry.season}&episode=${entry.episode}`
+                            : ""
                         }`
                       )
                     }
                   >
                     <div className="aspect-[16/9] bg-zinc-800 rounded-md overflow-hidden relative">
-                      {poster ? (
-                        <img src={poster} alt={entry.title} className="w-full h-full object-cover" />
-                      ) : null}
+                      {poster && (
+                        <img
+                          src={poster}
+                          alt={entry.title}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/cw:opacity-100 transition-opacity">
                         <Play className="w-8 h-8 text-white fill-current" />
                       </div>
                     </div>
                     <p className="text-zinc-300 text-xs mt-1.5 truncate">{entry.title}</p>
                     {entry.season && (
-                      <p className="text-zinc-500 text-xs">S{entry.season} E{entry.episode}</p>
+                      <p className="text-zinc-500 text-xs">
+                        S{entry.season} E{entry.episode}
+                      </p>
                     )}
                     <button
-                      onClick={(e) => { e.stopPropagation(); remove(entry.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        remove(entry.id);
+                      }}
                       className="absolute top-1 right-1 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover/cw:opacity-100 transition-opacity"
                     >
                       <X className="w-3 h-3 text-white" />
@@ -111,12 +159,36 @@ export function Home() {
         )}
 
         <MediaRow title="Trending This Week" items={heroItems} />
-        <MediaRow title="Popular Movies" items={popularMovies?.results || []} mediaType="movie" />
-        <MediaRow title="Now Playing" items={nowPlaying?.results || []} mediaType="movie" />
-        <MediaRow title="Popular TV Shows" items={popularTV?.results || []} mediaType="tv" />
-        <MediaRow title="Airing Today" items={airingToday?.results || []} mediaType="tv" />
-        <MediaRow title="Top Rated Movies" items={topRatedMovies?.results || []} mediaType="movie" />
-        <MediaRow title="Top Rated TV Shows" items={topRatedTV?.results || []} mediaType="tv" />
+        <MediaRow
+          title="Popular Movies"
+          items={popularMovies?.results || []}
+          mediaType="movie"
+        />
+        <MediaRow
+          title="Now Playing"
+          items={nowPlaying?.results || []}
+          mediaType="movie"
+        />
+        <MediaRow
+          title="Popular TV Shows"
+          items={popularTV?.results || []}
+          mediaType="tv"
+        />
+        <MediaRow
+          title="Airing Today"
+          items={airingToday?.results || []}
+          mediaType="tv"
+        />
+        <MediaRow
+          title="Top Rated Movies"
+          items={topRatedMovies?.results || []}
+          mediaType="movie"
+        />
+        <MediaRow
+          title="Top Rated TV Shows"
+          items={topRatedTV?.results || []}
+          mediaType="tv"
+        />
       </div>
     </div>
   );
